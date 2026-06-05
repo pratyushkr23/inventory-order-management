@@ -1,0 +1,52 @@
+services:
+
+  db:
+    image: postgres:15
+    container_name: inventory_db
+
+    restart: unless-stopped
+
+    environment:
+      POSTGRES_DB: inventory_management
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: Diptidb
+
+    ports:
+      - "5433:5432"
+
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+
+  backend:
+    build:
+      context: ./backend
+
+    container_name: inventory_backend
+
+    restart: unless-stopped
+
+    depends_on:
+      - db
+
+    env_file:
+      - ./backend/.env
+
+    ports:
+      - "8000:8000"
+
+  frontend:
+    build:
+      context: ./frontend
+
+    container_name: inventory_frontend
+
+    restart: unless-stopped
+
+    depends_on:
+      - backend
+
+    ports:
+      - "5173:5173"
+
+volumes:
+  postgres_data:
